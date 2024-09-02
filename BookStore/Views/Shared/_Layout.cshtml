@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookStore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BookStore.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <script>
+        function getShopingCart() {
+            const cookieName = "shopping_cart";
+            let cookiesArray = document.cookie.split(';');
+
+            for (let i = 0; i < cookiesArray.length;i++){
+                let cookie = cookiesArray[i];
+                if(cookie.includes(cookieName)){
+                    let cookie_value = cookie.substring(cookie.indexOf("=") + 1);
+
+                    try {
+                        let cart = JSON.parse(atob(cookie_value));
+                        return cart;
+                    }
+                    catch(exception){
+                        break;
+                    }
+                }
+            }
+
+            return {};
+        }
+
+        function saveCart(cart){
+            let cartStr = btoa(JSON.stringify(cart));
+
+            let d = new Date();
+            d.setDate(d.getDate + 365);
+            let expires =  d.toUTCString();
+            document.cookie = "shopping_cart=" + cartStr + ";expires=" + expires + ";path=/;SameSite=Strict; Secure";
+        }
+
+        function addToCart(button, id) 
+        {
+            let cart = getShopingCart();
+            let quantity = cart[id];
+
+            if (isNaN(quantity)) {
+                cart[id] = 1;
+            }
+            else {
+
+                cart[id] = Number(quantity)+1;
+            }
+            
+            saveCart(cart);
+            button.innerHTML = "Added <i class='bi bi-check-lg'></i>"
+        
+            let cartSize = 0;
+            for (var cartItem of Object.entries(cart)) { 
+                quantity = cartItem[1];
+                if (isNaN(quantity)) { 
+                    continue;
+                }
+
+                cartSize += Number(quantity);
+            }
+
+            document.getElementById("CartSize").innerHTML = cartSize;
+        }
+
+        function increase(id)
+        {
+            let cart= getShopingCart();
+            let quantity = cart[id];
+            if (isNaN(quantity)) {
+                cart[id] = 1;
+            } else { 
+                cart[id] = Number(quantity) + 1;
+            }
+
+            saveCart(cart);
+            location.reload();
+        }   
+
+        function decrease(id) {
+            let cart = getShopingCart();
+            let quantity = cart[id];
+
+            if (isNaN(quantity)) {
+                return;
+            }
+
+            quantity = Number(quantity);
+            if (quantity > 1) {
+                cart[id] = quantity - 1;
+                saveCart(cart);
+                location.reload();
+            }
+        }
+
+        function remove(id) 
+            {
+                let cart = getShopingCart();
+                if(cart[id])
+                {
+                    delete cart[id];
+                    saveCart(cart);
+                    location.reload();
+                }
+            }
+    </script>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BookStore</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index">All Books</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart4 text-danger h3"></i>
+                                <span id="CartSize" class="badge rounded-pill bg-danger" style="vertical-align:top;">
+                                @CartHelper.GetCartSize(Context.Request,Context.Response)</span></a>
+                        </li>
+                        
+                    </ul>
+@using BookStore.Services
+                    @using Microsoft.AspNetCore.Identity;
+                    @inject SignInManager<ApplicationUser> SignInManager;
+                    @inject UserManager<ApplicationUser> UserManager
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var appUser = await UserManager.GetUserAsync(User);
+                        if (User.IsInRole("admin"))
+                        {
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @(appUser!.FirstName + " "+ appUser!.LastName+ " (Admin)")
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index">Books List</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="AdminOrders" asp-action="Index">Orders</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        }
+                        else if (User.IsInRole("client"))
+                        {
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @(appUser!.FirstName + " " + appUser!.LastName + " (Client)")
+                                    </a>
+                                    <ul class="dropdown-menu">
+
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="ClientOrders" asp-action="Index">My Orders</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul class="navbar-nav">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                            </ul>
+                        }
+                    }
+                    
+                    else
+                    {
+                        
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary me-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        </ul>
+                    }
+
+                    
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - BookStore - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

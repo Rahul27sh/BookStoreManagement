@@ -1,0 +1,46 @@
+﻿@model List<Product>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div style="background-color:#08618d; >
+    <div class="container text-white py-5">
+        <div class="row align-item-center">
+            <div class="col-md-6">
+                <h1 class="mb-5 display-2"><strong>Best Book Store</strong></h1>
+            </div>
+            <div class="col-md-6 text-center" >
+                <img src="/images/home1.jpg" class="img-fluid"  />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-light">
+    <div class="container py-4">
+        <h2 class="pb-4 text-center"> Newest Books</h2>
+
+        <div class="row mb-5 g-3">
+            @foreach (var product in Model)
+            {
+                <div class="col-lg-3 col-md-6">
+                    <div class="rounded border shodow p-3 text-center h-100">
+                        <img src="/Products/@product.ImageFileName" class="img-fluid" alt="..." style="height:180px" />
+                        <hr/>
+                        <h5 class="py-2">@product.Name</h5>
+                        <p>
+                            Author: @product.Author, Category: @product.Category
+                        </p>
+                        <h4 class="mb-5">@(product.Price)</h4>
+
+                       <a class="btn btn-primary btn-sm mb-2" asp-controller="Store" asp-action="Details"
+                       asp-route-id="@product.Id"  role="button">Details</a>
+                        <button type="button" class="btn btn-warning btn-sm mb-2" onclick="addToCart(this, @product.Id)">
+                           Add to Cart <i class="bi bi-cart4"></i>
+                       </button>
+                    </div>
+                </div>    
+            }
+        </div>
+    </div>
+</div>

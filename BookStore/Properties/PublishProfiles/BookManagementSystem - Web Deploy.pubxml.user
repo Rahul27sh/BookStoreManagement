@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAQQ1vqQYIckecYQyW75ocfgAAAAACAAAAAAAQZgAAAAEAACAAAABGcGg0H3AK4LOvsPR2eK8Z4K8VV6nBKDxzcd/Xkn0rfgAAAAAOgAAAAAIAACAAAABntJE+XZmTuV0gzNs+fVSxISfcG5ras7PtMR5bp7uYZyAAAADe11XdsFJl2vKcZzAfrestkeNK3RQYb0I7uP/Di3oNd0AAAADSYDckw6eQlw5Kh5ZxVRD6jzOfmQs+J3LKR+zr+Rewv7dPMQYH5nXi6s2B6lrVcHDK9Ph0RWpDi2in3STtW9z6</EncryptedPassword>
+    <History>False|2024-08-24T06:59:46.1753606Z||;False|2024-08-24T12:26:23.6543683+05:30||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <AzureDBConnectionStrings Include="Data Source=bookstoredbserverdb.database.windows.net,1433;Initial Catalog=bookstoremanagementdb;User ID=rahulsh;Password=Wallpaper@123" />
+    <AzureDBConnectionStrings Include="REDACTED" />
+  </ItemGroup>
+</Project>
